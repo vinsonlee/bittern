@@ -173,7 +173,11 @@ void sm_dirty_write_miss_copy_to_cache_end(struct bittern_cache *bc,
 	 * wakeup possible waiters
 	 */
 	wakeup_deferred(bc);
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4,3,0)
 	bio_endio(bio, 0);
+#else
+	bio_endio(bio);
+#endif
 }
 
 void sm_clean_write_miss_copy_to_device_start(struct bittern_cache *bc,
@@ -469,7 +473,11 @@ void sm_clean_write_miss_copy_to_cache_end(struct bittern_cache *bc,
 
 	work_item_del_pending_io(bc, wi);
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4,3,0)
 	bio_endio(bio, 0);
+#else
+	bio_endio(bio);
+#endif
 
 	/*
 	 * wakeup possible waiters
@@ -841,7 +849,11 @@ void sm_dirty_write_hit_copy_to_cache_end(struct bittern_cache *bc,
 
 	work_item_del_pending_io(bc, wi);
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4,3,0)
 	bio_endio(bio, 0);
+#else
+	bio_endio(bio);
+#endif
 
 	/*
 	 * wakeup possible waiters

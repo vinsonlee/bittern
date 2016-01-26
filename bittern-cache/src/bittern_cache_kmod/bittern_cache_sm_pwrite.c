@@ -310,5 +310,9 @@ void sm_pwrite_miss_copy_to_cache_end(struct bittern_cache *bc,
 	 * wakeup possible waiters
 	 */
 	wakeup_deferred(bc);
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4,3,0)
 	bio_endio(bio, 0);
+#else
+	bio_endio(bio);
+#endif
 }

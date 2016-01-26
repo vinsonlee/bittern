@@ -82,7 +82,12 @@ void cached_dev_bypass_endio(struct bio *cloned_bio, int err)
 	work_item_free(bc, wi);
 
 	/* all done */
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4,3,0)
 	bio_endio(original_bio, 0);
+#else
+	bio_endio(original_bio);
+#endif
+
 }
 
 /*!
@@ -2087,7 +2092,11 @@ int cache_map_workfunc(struct bittern_cache *bc,
 	if (bio_is_pureflush_request(bio)) {
 		BT_TRACE(BT_LEVEL_TRACE1, bc, NULL, NULL, bio, NULL,
 			 "req-pureflush");
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4,3,0)
 		bio_endio(bio, 0);
+#else
+		bio_endio(bio);
+#endif
 		return 1;
 	}
 
@@ -2098,7 +2107,11 @@ int cache_map_workfunc(struct bittern_cache *bc,
 		 * wakeup possible waiters
 		 */
 		wakeup_deferred(bc);
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4,3,0)
 		bio_endio(bio, 0);
+#else
+		bio_endio(bio);
+#endif
 		return 1;
 	}
 
@@ -2259,7 +2272,12 @@ int bittern_cache_map(struct dm_target *ti, struct bio *bio)
 
 	if (bc->error_state != ES_NOERROR) {
 		/* error state, bailout with error */
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4,3,0)
 		bio_endio(bio, -EIO);
+#else
+		bio->bi_error = -EIO;
+		bio_endio(bio);
+#endif
 		return DM_MAPIO_SUBMITTED;
 	}
 
